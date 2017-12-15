@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.example.yellow.githubuserfetcher.MainActivity">
+
+    <EditText
+        android:id="@+id/search_text_edit"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:hint="Input The Key Word To Fetch With"
+        android:textColorHint="@color/colorHint"
+        android:gravity="center"
+        android:layout_marginEnd="15dp"
+        android:layout_marginStart="15dp"
+        android:layout_marginTop="15dp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+    <Button
+        android:id="@+id/clear_btn"
+        android:layout_width="150dp"
+        android:layout_height="48dp"
+        android:layout_marginTop="5dp"
+        android:layout_marginStart="20dp"
+        android:text="CLEAR"
+        android:background="@drawable/btn_bg"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/search_text_edit"
+        app:layout_constraintRight_toLeftOf="@+id/fetch_btn"
+        />
+    <Button
+        android:id="@+id/fetch_btn"
+        android:layout_width="150dp"
+        android:layout_height="48dp"
+        android:layout_marginTop="5dp"
+        android:layout_marginStart="20dp"
+        android:layout_marginEnd="20dp"
+        android:text="FETCH"
+        android:background="@drawable/btn_bg"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/search_text_edit"
+        app:layout_constraintLeft_toRightOf="@+id/clear_btn"
+        />
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/user_recyclerview"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/clear_btn"
+        android:layout_marginTop="15dp">
+
+    </android.support.v7.widget.RecyclerView>
+
+
+</android.support.constraint.ConstraintLayout>

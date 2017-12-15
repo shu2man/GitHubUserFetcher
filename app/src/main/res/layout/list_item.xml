@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="98dp"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <TextView
+        android:id="@+id/repository_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="BirthdayReminder"
+        android:textSize="20sp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        android:layout_marginTop="10dp"
+        android:layout_marginStart="20dp"/>
+    <TextView
+        android:id="@+id/language_type"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Java"
+        android:textSize="18sp"
+        app:layout_constraintTop_toBottomOf="@id/repository_name"
+        app:layout_constraintLeft_toLeftOf="parent"
+        android:layout_marginTop="7dp"
+        android:layout_marginStart="20dp"/>
+    <TextView
+        android:id="@+id/brief_information"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="can not read phone contacts, error"
+        android:textSize="14sp"
+        app:layout_constraintTop_toBottomOf="@id/language_type"
+        app:layout_constraintLeft_toLeftOf="parent"
+        android:layout_marginTop="7dp"
+        android:layout_marginStart="20dp" />
+
+</android.support.constraint.ConstraintLayout>
