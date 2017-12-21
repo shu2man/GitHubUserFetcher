@@ -23,11 +23,12 @@
     <Button
         android:id="@+id/clear_btn"
         android:layout_width="150dp"
-        android:layout_height="48dp"
+        android:layout_height="45dp"
         android:layout_marginTop="5dp"
         android:layout_marginStart="20dp"
         android:text="CLEAR"
         android:background="@drawable/btn_bg"
+        android:onClick="clearList"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/search_text_edit"
         app:layout_constraintRight_toLeftOf="@+id/fetch_btn"
@@ -35,12 +36,13 @@
     <Button
         android:id="@+id/fetch_btn"
         android:layout_width="150dp"
-        android:layout_height="48dp"
+        android:layout_height="45dp"
         android:layout_marginTop="5dp"
         android:layout_marginStart="20dp"
         android:layout_marginEnd="20dp"
         android:text="FETCH"
         android:background="@drawable/btn_bg"
+        android:onClick="fetchByKeyWord"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/search_text_edit"
         app:layout_constraintLeft_toRightOf="@+id/clear_btn"
@@ -56,5 +58,15 @@
 
     </android.support.v7.widget.RecyclerView>
 
+    <ProgressBar
+        android:id="@+id/loading_progressbar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintVertical_bias="0.4"/>
 
 </android.support.constraint.ConstraintLayout>
