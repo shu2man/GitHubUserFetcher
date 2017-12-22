@@ -78,13 +78,14 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder>{
         names.add(name);
         ids.add("id:"+id);
         blogs.add("blog:"+blog);
-        notifyItemInserted(0);
+        notifyItemInserted(ids.size()-1);
+        //notifyDataSetChanged();
     }
     public void remove(int pos){
         names.remove(pos);
         ids.remove(pos);
         blogs.remove(pos);
-        notifyItemRemoved(pos);
+        //notifyItemRemoved(pos);
         notifyDataSetChanged();
     }
     public void clear(){

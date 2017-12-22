@@ -64,12 +64,14 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        verifyPermission(this);
+
         initRecyclerView();
 
         searchEt=(EditText)findViewById(R.id.search_text_edit);
         progressBar=(ProgressBar)findViewById(R.id.loading_progressbar);
 
-        addDefaultData();
+        //addDefaultData();
     }
 
     public void fetchByKeyWord(View view){
@@ -104,7 +106,7 @@ public class MainActivity extends AppCompatActivity {
                 .subscribe(new Subscriber<GitHubUser>() {
                     @Override
                     public void onCompleted() {
-                        Toast.makeText(MainActivity.this,"Done",Toast.LENGTH_SHORT).show();
+                        //Toast.makeText(MainActivity.this,"Done",Toast.LENGTH_SHORT).show();
                         progressBar.setVisibility(View.GONE);
                     }
 
@@ -116,8 +118,12 @@ public class MainActivity extends AppCompatActivity {
 
                     @Override
                     public void onNext(GitHubUser gitHubUser) {
-                        myAdapter.add(gitHubUser.getLogin(),gitHubUser.getId().toString(),gitHubUser.getBlog());
-                        Toast.makeText(MainActivity.this,gitHubUser.getLogin()+gitHubUser.getId().toString()+gitHubUser.getBlog(),Toast.LENGTH_SHORT).show();
+                        String l=gitHubUser.getLogin();
+                        String i=gitHubUser.getId().toString();
+                        String b=gitHubUser.getBlog();
+                        //myAdapter.add(gitHubUser.getLogin(),gitHubUser.getId().toString(),gitHubUser.getBlog());
+                        myAdapter.add(l,i,b);
+                        //Toast.makeText(MainActivity.this,gitHubUser.getLogin()+gitHubUser.getId().toString()+gitHubUser.getBlog(),Toast.LENGTH_SHORT).show();
                         //progressBar.setVisibility(View.GONE);
                     }
                 });
@@ -148,41 +154,6 @@ public class MainActivity extends AppCompatActivity {
         rx.Subscriber<GitHubUser> getUser_sub(@Path("user") String user);
     }
 
-    class GetThread extends Thread{
-
-        public void run(){
-            searchKey=searchEt.getText().toString();
-            String urlStr="https://api.github.com/users/"+searchKey;
-
-            String baseurl="http://api.github.com";
-            Retrofit retrofit=new Retrofit.Builder()
-                    .baseUrl(baseurl)//要访问的网站
-                    .addConverterFactory(GsonConverterFactory.create())//使用的转换器
-                    .addCallAdapterFactory(RxJavaCallAdapterFactory.create())//适配器
-                    .build();
-            GithubInterface service=retrofit.create(GithubInterface.class);
-            retrofit2.Call<GitHubUser> modelA=service.getUser_Call(searchKey);
-            rx.Observable<GitHubUser> modelB=service.getUser(searchKey);
-            modelA.enqueue(new Callback<GitHubUser>() {
-                @Override
-                public void onResponse(retrofit2.Call<GitHubUser> call, Response<GitHubUser> response) {
-                    String login=response.body().getLogin();
-                    String id=response.body().getId().toString();
-                    String blog=response.body().getBlog();
-                    addUserToList(login,id,blog);
-                }
-
-                @Override
-                public void onFailure(retrofit2.Call<GitHubUser> call, Throwable t) {
-                    Toast.makeText(MainActivity.this,"Fetch fail, Please check your keyword or the internet",Toast.LENGTH_SHORT).show();
-                }
-            });
-
-        }
-
-
-
-    }
 
     public void initRecyclerView(){
         recyclerView=(RecyclerView)findViewById(R.id.user_recyclerview);

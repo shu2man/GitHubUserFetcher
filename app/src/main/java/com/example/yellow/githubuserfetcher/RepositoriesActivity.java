@@ -35,28 +35,29 @@ public class RepositoriesActivity extends Activity {
     private ProgressBar progressBar;
 
     private List<Map<String,Object>> datas;
+    private ArrayList<GitHubRepository> DataList;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_respositories);
+        name=getIntent().getStringExtra("name");
+        //Toast.makeText(this,name,Toast.LENGTH_SHORT).show();
 
-        name=savedInstanceState.getString("name");
-
+        datas=new ArrayList<>();
         getRepositories();//先获取数据
-        initListView();//再显示数据
+        //initListView();//再显示数据
     }
 
     public void initListView(){
-        datas=new ArrayList<>();
-
         ListView lv;
         lv=findViewById(R.id.respositories_list);
-
+        if(datas!=null) Toast.makeText(this,datas.size()+"",Toast.LENGTH_SHORT).show();
         SimpleAdapter adapter=new SimpleAdapter(this,datas,R.layout.list_item,
                 new String[]{"name","language","description"},
                 new int[]{R.id.repository_name,R.id.language_type,R.id.brief_information});
+        lv.setAdapter(adapter);
     }
 
     public void backToMain(View view){
@@ -66,15 +67,13 @@ public class RepositoriesActivity extends Activity {
     }
 
     public interface GithubRepos{
-        @GET("/repos")
+        @GET("repos")
         rx.Observable<ArrayList<GitHubRepository>> getRepos();//使用RxJava返回类型为observable
-        retrofit2.Call<GitHubUser> getUser_Call(@Path("user") String user);
-        rx.Subscriber<GitHubUser> getUser_sub(@Path("user") String user);
     }
     public void getRepositories(){
         progressBar=findViewById(R.id.respositories_progressbar);
         String rpsurl="https://api.github.com/users/shu2man/repos";
-        String baseurl="https://api.github.com/users"+name;
+        String baseurl="https://api.github.com/users/"+name+"/";
 
         Retrofit retrofit=new Retrofit.Builder()
                 .baseUrl(baseurl)//要访问的网站
@@ -93,7 +92,7 @@ public class RepositoriesActivity extends Activity {
                 .subscribe(new Subscriber<ArrayList<GitHubRepository>>() {
                     @Override
                     public void onCompleted() {
-                        Toast.makeText(RepositoriesActivity.this,"Done",Toast.LENGTH_SHORT).show();
+                        //Toast.makeText(RepositoriesActivity.this,"Done",Toast.LENGTH_SHORT).show();
                         progressBar.setVisibility(View.GONE);
                     }
 
@@ -105,20 +104,33 @@ public class RepositoriesActivity extends Activity {
 
                     @Override
                     public void onNext(ArrayList<GitHubRepository> reposList) {
+                        //if(reposList.size()==0) Toast.makeText(RepositoriesActivity.this,"The User Has No Repository!",Toast.LENGTH_SHORT).show();
                         setListData(reposList);
-                        //Toast.makeText(RepositoriesActivity.this,repos.getName()+repos.getLanguage()+repos.getDescription(),Toast.LENGTH_SHORT).show();
-                        //progressBar.setVisibility(View.GONE);
                     }
                 });
     }
     public void setListData(ArrayList<GitHubRepository> reposList){
+        if(reposList.size()==0){
+            Map<String,Object> item=new HashMap<>();
+            item.put("name","        No Repository To Show");
+            item.put("language","");
+            item.put("description","");
+            datas.add(item);
+            return;
+        }
+        String n="";
         for(int i=0;i<reposList.size();i++){
             Map<String,Object> item=new HashMap<>();
             item.put("name",reposList.get(i).getName());
             item.put("language",reposList.get(i).getLanguage());
-            item.put("description",reposList.get(i).getDescription());
+            if(reposList.get(i).getDescription().length()>45){
+                item.put("language",reposList.get(i).getDescription().substring(0,44)+"...");
+            }
+            else item.put("description",reposList.get(i).getDescription());
             datas.add(item);
+            n+=reposList.get(i).getName();
         }
+        initListView();//再显示数据
     }
 
 
