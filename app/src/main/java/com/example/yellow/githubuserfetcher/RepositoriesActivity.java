@@ -123,8 +123,8 @@ public class RepositoriesActivity extends Activity {
             Map<String,Object> item=new HashMap<>();
             item.put("name",reposList.get(i).getName());
             item.put("language",reposList.get(i).getLanguage());
-            if(reposList.get(i).getDescription().length()>45){
-                item.put("language",reposList.get(i).getDescription().substring(0,44)+"...");
+            if(reposList.get(i).getDescription().length()>31){
+                item.put("description",reposList.get(i).getDescription().substring(0,30)+"...");
             }
             else item.put("description",reposList.get(i).getDescription());
             datas.add(item);
