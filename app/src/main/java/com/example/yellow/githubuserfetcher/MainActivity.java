@@ -1,7 +1,12 @@
 package com.example.yellow.githubuserfetcher;
 
+import android.Manifest;
+import android.app.Activity;
+import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.database.Observable;
 import android.database.sqlite.SQLiteDatabase;
+import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.DefaultItemAnimator;
@@ -10,6 +15,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -50,6 +56,9 @@ public class MainActivity extends AppCompatActivity {
     private MyAdapter myAdapter;
     private ProgressBar progressBar;
 
+    private boolean hasPermission=true;
+    private static String[] PERMISSION_CONTACTS={Manifest.permission.INTERNET};
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -65,29 +74,33 @@ public class MainActivity extends AppCompatActivity {
 
     public void fetchByKeyWord(View view){
         searchKey=searchEt.getText().toString();
+        hideKeyBoard();
         if(searchKey.equals("")){
             Toast.makeText(this,"Empty Key!",Toast.LENGTH_SHORT).show();
             return;
         }
         progressBar.setVisibility(View.VISIBLE);
         String urlStr="https://api.github.com/users/"+searchKey;
-        String baseurl="http://api.github.com";
+        String baseurl="https://api.github.com";
 
         Retrofit retrofit=new Retrofit.Builder()
                 .baseUrl(baseurl)//要访问的网站
                 .addConverterFactory(GsonConverterFactory.create())//使用的转换器
                 .addCallAdapterFactory(RxJavaCallAdapterFactory.create())//适配器
                 .client(new OkHttpClient.Builder()
-                    .connectTimeout(10, TimeUnit.SECONDS)
-                    .readTimeout(15,TimeUnit.SECONDS)
-                    .writeTimeout(10,TimeUnit.SECONDS)
-                    .build())
+                        .connectTimeout(10, TimeUnit.SECONDS)
+                        .readTimeout(20,TimeUnit.SECONDS)
+                        .writeTimeout(10,TimeUnit.SECONDS)
+                        .build())
                 .build();
         GithubInterface service=retrofit.create(GithubInterface.class);
         //retrofit2.Call<GitHubUser> modelA=service.getUser_Call(searchKey);
-        rx.Observable<GitHubUser> modelB=service.getUser(searchKey);
-        modelB.subscribeOn(Schedulers.newThread())
-                .observeOn(AndroidSchedulers.mainThread())
+        //这种先获取Model再操作的方式无法请求到结果
+/*        rx.Observable<GitHubUser> modelB=service.getUser(searchKey);
+        modelB.subscribeOn(Schedulers.io())//Schedulers.newThread()新线程请求,Schedulers.io()io线程*/
+        service.getUser(searchKey)
+                .subscribeOn(Schedulers.io())//Schedulers.newThread()新线程请求,Schedulers.io()io线程
+                .observeOn(AndroidSchedulers.mainThread())//回调在主线程
                 .subscribe(new Subscriber<GitHubUser>() {
                     @Override
                     public void onCompleted() {
@@ -97,13 +110,14 @@ public class MainActivity extends AppCompatActivity {
 
                     @Override
                     public void onError(Throwable e) {
-                        Toast.makeText(MainActivity.this,"Fetch fail, Check your input or the internet",Toast.LENGTH_SHORT).show();
+                        Toast.makeText(MainActivity.this,"Fail, Check your input or the internet",Toast.LENGTH_SHORT).show();//
                         progressBar.setVisibility(View.GONE);
                     }
 
                     @Override
                     public void onNext(GitHubUser gitHubUser) {
                         myAdapter.add(gitHubUser.getLogin(),gitHubUser.getId().toString(),gitHubUser.getBlog());
+                        Toast.makeText(MainActivity.this,gitHubUser.getLogin()+gitHubUser.getId().toString()+gitHubUser.getBlog(),Toast.LENGTH_SHORT).show();
                         //progressBar.setVisibility(View.GONE);
                     }
                 });
@@ -128,6 +142,7 @@ public class MainActivity extends AppCompatActivity {
 
     public interface GithubInterface{
         @GET("/users/{user}")
+            //使用RxJava返回类型为observable
         rx.Observable<GitHubUser> getUser(@Path("user") String user);
         retrofit2.Call<GitHubUser> getUser_Call(@Path("user") String user);
         rx.Subscriber<GitHubUser> getUser_sub(@Path("user") String user);
@@ -176,6 +191,9 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onItemClick(View view, int position) {
                 Toast.makeText(MainActivity.this,myAdapter.getName(position),Toast.LENGTH_SHORT).show();
+                Intent intent=new Intent(MainActivity.this,RepositoriesActivity.class);
+                intent.putExtra("name",myAdapter.getName(position));
+                startActivity(intent);
             }
 
             @Override
@@ -193,12 +211,41 @@ public class MainActivity extends AppCompatActivity {
     }
     public void clearList(View view){
         myAdapter.clear();
+        searchEt.setText("");
         Toast.makeText(MainActivity.this,"CLEARED",Toast.LENGTH_SHORT).show();
     }
 
     public void addDefaultData(){
         myAdapter.add("ABCDEFG","1234567","www.myblog.com");
         myAdapter.add("HIJKLMN","8901213","www.github.com");
+    }
+    public void hideKeyBoard(){
+        View view=getCurrentFocus();
+        if(view!=null){
+            ((InputMethodManager)getSystemService(getApplicationContext().INPUT_METHOD_SERVICE))
+                    .hideSoftInputFromWindow(view.getWindowToken(),InputMethodManager.HIDE_NOT_ALWAYS);
+        }
+    }
+
+    public void verifyPermission(Activity activity){
+        try{
+            int permission= ActivityCompat.checkSelfPermission(activity,"android.permission.READ_CONTACTS");
+            if(permission!= PackageManager.PERMISSION_GRANTED){
+                ActivityCompat.requestPermissions(activity,PERMISSION_CONTACTS,1);
+            }
+            else hasPermission=true;
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+    }
+    @Override
+    public void onRequestPermissionsResult(int requestCode,String permission[],int[] grantResults){
+        if(grantResults.length>0 && grantResults[0]==PackageManager.PERMISSION_GRANTED){
+            //permission granted
+        }
+        else{
+            //permission not set
+        }
     }
 
 }

@@ -76,8 +76,8 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder>{
     }
     public void add(String name,String id,String blog){
         names.add(name);
-        ids.add(id);
-        blogs.add(blog);
+        ids.add("id:"+id);
+        blogs.add("blog:"+blog);
         notifyItemInserted(0);
     }
     public void remove(int pos){
@@ -85,6 +85,7 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder>{
         ids.remove(pos);
         blogs.remove(pos);
         notifyItemRemoved(pos);
+        notifyDataSetChanged();
     }
     public void clear(){
         names.clear();
