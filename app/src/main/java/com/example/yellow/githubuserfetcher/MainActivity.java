@@ -56,9 +56,6 @@ public class MainActivity extends AppCompatActivity {
     private MyAdapter myAdapter;
     private ProgressBar progressBar;
 
-    private boolean hasPermission=true;
-    private static String[] PERMISSION_CONTACTS={Manifest.permission.INTERNET};
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -86,7 +83,7 @@ public class MainActivity extends AppCompatActivity {
         String baseurl="https://api.github.com";
 
         Retrofit retrofit=new Retrofit.Builder()
-                .baseUrl(baseurl)//要访问的网站
+                .baseUrl(baseurl)//要访问的网站，baseUrl: https://api.github.com
                 .addConverterFactory(GsonConverterFactory.create())//使用的转换器
                 .addCallAdapterFactory(RxJavaCallAdapterFactory.create())//适配器
                 .client(new OkHttpClient.Builder()
@@ -95,36 +92,30 @@ public class MainActivity extends AppCompatActivity {
                         .writeTimeout(10,TimeUnit.SECONDS)
                         .build())
                 .build();
-        GithubInterface service=retrofit.create(GithubInterface.class);
         //retrofit2.Call<GitHubUser> modelA=service.getUser_Call(searchKey);
         //这种先获取Model再操作的方式无法请求到结果
 /*        rx.Observable<GitHubUser> modelB=service.getUser(searchKey);
         modelB.subscribeOn(Schedulers.io())//Schedulers.newThread()新线程请求,Schedulers.io()io线程*/
+        GithubInterface service=retrofit.create(GithubInterface.class);
         service.getUser(searchKey)
                 .subscribeOn(Schedulers.io())//Schedulers.newThread()新线程请求,Schedulers.io()io线程
                 .observeOn(AndroidSchedulers.mainThread())//回调在主线程
                 .subscribe(new Subscriber<GitHubUser>() {
                     @Override
                     public void onCompleted() {
-                        //Toast.makeText(MainActivity.this,"Done",Toast.LENGTH_SHORT).show();
                         progressBar.setVisibility(View.GONE);
                     }
-
                     @Override
                     public void onError(Throwable e) {
                         Toast.makeText(MainActivity.this,"Fail, Check your input or the internet",Toast.LENGTH_SHORT).show();//
                         progressBar.setVisibility(View.GONE);
                     }
-
                     @Override
                     public void onNext(GitHubUser gitHubUser) {
                         String l=gitHubUser.getLogin();
                         String i=gitHubUser.getId().toString();
                         String b=gitHubUser.getBlog();
-                        //myAdapter.add(gitHubUser.getLogin(),gitHubUser.getId().toString(),gitHubUser.getBlog());
                         myAdapter.add(l,i,b);
-                        //Toast.makeText(MainActivity.this,gitHubUser.getLogin()+gitHubUser.getId().toString()+gitHubUser.getBlog(),Toast.LENGTH_SHORT).show();
-                        //progressBar.setVisibility(View.GONE);
                     }
                 });
 /*        modelA.enqueue(new Callback<GitHubUser>() {
@@ -150,8 +141,6 @@ public class MainActivity extends AppCompatActivity {
         @GET("/users/{user}")
             //使用RxJava返回类型为observable
         rx.Observable<GitHubUser> getUser(@Path("user") String user);
-        retrofit2.Call<GitHubUser> getUser_Call(@Path("user") String user);
-        rx.Subscriber<GitHubUser> getUser_sub(@Path("user") String user);
     }
 
 
@@ -198,13 +187,14 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+
+    private static String[] PERMISSION_INTERNET={Manifest.permission.INTERNET};
     public void verifyPermission(Activity activity){
         try{
-            int permission= ActivityCompat.checkSelfPermission(activity,"android.permission.READ_CONTACTS");
+            int permission= ActivityCompat.checkSelfPermission(activity,"android.permission.INTERNET");
             if(permission!= PackageManager.PERMISSION_GRANTED){
-                ActivityCompat.requestPermissions(activity,PERMISSION_CONTACTS,1);
+                ActivityCompat.requestPermissions(activity,PERMISSION_INTERNET,1);
             }
-            else hasPermission=true;
         }catch (Exception e){
             e.printStackTrace();
         }

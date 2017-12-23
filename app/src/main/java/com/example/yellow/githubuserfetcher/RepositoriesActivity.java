@@ -43,7 +43,6 @@ public class RepositoriesActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_respositories);
         name=getIntent().getStringExtra("name");
-        //Toast.makeText(this,name,Toast.LENGTH_SHORT).show();
 
         datas=new ArrayList<>();
         getRepositories();//先获取数据
@@ -73,8 +72,8 @@ public class RepositoriesActivity extends Activity {
     public void getRepositories(){
         progressBar=findViewById(R.id.respositories_progressbar);
         String rpsurl="https://api.github.com/users/shu2man/repos";
-        String baseurl="https://api.github.com/users/"+name+"/";
 
+        String baseurl="https://api.github.com/users/"+name+"/";
         Retrofit retrofit=new Retrofit.Builder()
                 .baseUrl(baseurl)//要访问的网站
                 .addConverterFactory(GsonConverterFactory.create())//使用的转换器
@@ -110,15 +109,6 @@ public class RepositoriesActivity extends Activity {
                 });
     }
     public void setListData(ArrayList<GitHubRepository> reposList){
-        if(reposList.size()==0){
-            Map<String,Object> item=new HashMap<>();
-            item.put("name","        No Repository To Show");
-            item.put("language","");
-            item.put("description","");
-            datas.add(item);
-            return;
-        }
-        String n="";
         for(int i=0;i<reposList.size();i++){
             Map<String,Object> item=new HashMap<>();
             item.put("name",reposList.get(i).getName());
@@ -128,9 +118,8 @@ public class RepositoriesActivity extends Activity {
             }
             else item.put("description",reposList.get(i).getDescription());
             datas.add(item);
-            n+=reposList.get(i).getName();
         }
-        initListView();//再显示数据
+        initListView();//显示数据
     }
 
 

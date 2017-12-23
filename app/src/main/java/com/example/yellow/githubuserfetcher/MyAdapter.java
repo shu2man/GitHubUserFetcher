@@ -85,8 +85,7 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder>{
         names.remove(pos);
         ids.remove(pos);
         blogs.remove(pos);
-        //notifyItemRemoved(pos);
-        notifyDataSetChanged();
+        notifyItemRemoved(pos);
     }
     public void clear(){
         names.clear();
